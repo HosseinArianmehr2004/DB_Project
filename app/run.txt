@@ -1,0 +1,3 @@
+Run the following command from within the "app" folder
+
+uvicorn main:app --reload
