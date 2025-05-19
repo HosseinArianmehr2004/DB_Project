@@ -1,16 +1,41 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-import database, models
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo.errors import OperationFailure
+from config import templates
+import database
+
+from routes.auth import router as auth_router
+from routes.profile import router as profile_router
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Configure templates directory
-templates = Jinja2Templates(directory="templates")
+
+@app.on_event("startup")
+async def setup_indexes():
+    try:
+        await database.db.users.drop_index("username_1")
+    except OperationFailure:
+        pass
+
+    await database.db.users.create_index(
+        [("username", 1)],
+        unique=True,
+        partialFilterExpression={"username": {"$type": "string"}},
+    )
 
 
 # Route to render index.html
@@ -19,28 +44,5 @@ async def read_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/register", response_class=HTMLResponse)
-async def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
-
-
-@app.post("/register")
-async def register_user(user: models.User):
-    # Check if username or email already exists
-    existing_user = await database.db.users.find_one(
-        {"$or": [{"username": user.username}, {"email": user.email}]}
-    )
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists.")
-
-    # Insert user into the database
-    result = await database.db.users.insert_one(user.dict())
-    return {"message": "User registered successfully", "id": str(result.inserted_id)}
-
-
-@app.get("/users")
-async def get_all_users():
-    users = await database.db.users.find().to_list(100)
-    for user in users:
-        user["_id"] = str(user["_id"])  # Convert ObjectId to string for JSON serialization
-    return users
+app.include_router(auth_router)
+app.include_router(profile_router)

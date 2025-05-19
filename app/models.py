@@ -4,16 +4,17 @@ from datetime import date, datetime
 
 
 class User(BaseModel):
-    username: str
+    username: Optional[str] = None
     password: str
     email: EmailStr
     is_premium: bool = False
-    firstname: Optional[str] = None
-    lastname: Optional[str] = None
+    name: Optional[str] = None
+    # lastname: Optional[str] = None
     birthdate: Optional[date] = None
     gender: Optional[str] = None
     country: Optional[str] = None
-    credit_card: Optional[str] = None
+    # credit_card: Optional[str] = None
+    profile_image: Optional[str] = None
 
 
 class Song(BaseModel):
@@ -51,3 +52,5 @@ class SearchEntry(BaseModel):
     user_id: str
     query: str
     timestamp: datetime
+
+
