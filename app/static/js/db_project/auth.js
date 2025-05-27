@@ -1,14 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     register();
     login();
-    checkLoginStatus();
-    // if (localStorage.getItem("loggedInEmail")) {
-    //     addProfileMenuItem();
-    // }
 });
 
 function register() {
     const registerBtn = document.getElementById('register-btn');
+    const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirm-password');
@@ -26,12 +23,19 @@ function register() {
     registerBtn.addEventListener('click', async (event) => {
         event.preventDefault();
 
+        const username = usernameInput.value.trim();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
 
-        if (!email || !password || !confirmPassword) {
+        if (!username || !email || !password || !confirmPassword) {
             showMessage("All fields are required.");
+            return;
+        }
+
+        // Simple username validation example: min 6 chars, alphanumeric
+        if (!/^[a-zA-Z0-9_]{6,}$/.test(username)) {
+            showMessage("Username must be at least 6 characters and contain only letters, numbers, or underscores.");
             return;
         }
 
@@ -56,6 +60,7 @@ function register() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    username: username,   // new
                     email: email,
                     password: password,
                 })
@@ -116,19 +121,22 @@ function login() {
             if (response.ok) {
                 showMessage("Login successful!", "green");
 
-                localStorage.setItem("loggedInEmail", email);
+                // Fetch username from the server
+                try {
+                    const usernameRes = await fetch(`/get_username?email=${encodeURIComponent(email)}`);
+                    if (usernameRes.ok) {
+                        const { username } = await usernameRes.json();
+                        localStorage.setItem("loggedInUsername", username);
+                    }
+                } catch (fetchErr) {
+                    console.warn("Could not fetch username:", fetchErr);
+                }
 
-                // window.common.addProfileMenuItem();
-                // window.common.updateHeaderUI();
-
-                // OPTIONAL: Save auth info (e.g., token)
-                // localStorage.setItem('token', data.token);
-
-                // Redirect to profile.html after delay
                 setTimeout(() => {
                     window.location.href = "/profile";
                 }, 1000);
-            } else {
+            }
+            else {
                 showMessage(data.detail || "Invalid credentials.");
             }
         } catch (error) {

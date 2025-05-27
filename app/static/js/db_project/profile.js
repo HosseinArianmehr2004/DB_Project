@@ -1,21 +1,39 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const email = localStorage.getItem("loggedInEmail");
-    if (!email) {
+    const username = localStorage.getItem("loggedInUsername");
+    if (!username) {
         alert("You must be logged in.");
         window.location.href = "/";
         return;
     }
 
-    const userData = await fetchUserProfile(email);
+    const userData = await fetchUserProfile(username);
     if (!userData) return;
 
-    set_profile(email);
+    set_profile(username);
 
     const profileImgElement = document.getElementById("profileImage");
+
+    // if (profileImgElement) {
+    //     // const imagePath = userData.profile_image || "/static/images/profiles/default.jpg";
+    //     const imagePath = `${username}.jpg` || "/static/images/profiles/default.jpg";
+    //     profileImgElement.src = imagePath;
+    // }
+
     if (profileImgElement) {
-        const imagePath = userData.profile_image || "/static/images/profiles/default.jpg";
-        profileImgElement.src = imagePath;
+        const userImagePath = `/static/images/profiles/${username}.jpg`;
+        const defaultImagePath = "/static/images/profiles/profile_default.jpg";
+
+        const testImage = new Image();
+        testImage.onload = function () {
+            profileImgElement.src = userImagePath;
+        };
+        testImage.onerror = function () {
+            profileImgElement.src = defaultImagePath;
+        };
+        testImage.src = userImagePath;
     }
+
+
 
     if (userData.is_premium) {
         document.getElementById("premiumBadge").classList.remove("d-none");
@@ -39,9 +57,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     logout();
 });
 
-async function fetchUserProfile(email) {
+async function fetchUserProfile(username) {
     try {
-        const res = await fetch(`/get-profile?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`/get-profile?username=${encodeURIComponent(username)}`);
         if (!res.ok) throw new Error("Failed to fetch user");
         return await res.json();
     } catch (err) {
@@ -51,7 +69,7 @@ async function fetchUserProfile(email) {
     }
 }
 
-function set_profile(email) {
+function set_profile(username) {
     const profileImage = document.getElementById("profileImageWrapper");
     const imageInput = document.getElementById("profileImageInput");
 
@@ -65,7 +83,7 @@ function set_profile(email) {
 
         const formData = new FormData();
         formData.append("image", file);
-        formData.append("email", email); // Or username if needed
+        formData.append("username", username);
 
         try {
             const res = await fetch("/upload-profile-image", {
@@ -87,7 +105,7 @@ function set_profile(email) {
     });
 }
 
-function config_buttons(email) {
+function config_buttons() {
     const editBtn = document.getElementById("editProfileBtn");
     const saveBtn = document.getElementById("saveProfileBtn");
     const cancelBtn = document.getElementById("cancelProfileBtn");
@@ -107,10 +125,11 @@ function config_buttons(email) {
 
         const formData = new FormData(document.getElementById("profileForm"));
         const data = Object.fromEntries(formData.entries());
-        data.email = localStorage.getItem("loggedInEmail"); // Ensure email is used to identify user
-        console.log("Email in JS:", email); // Should not be null or empty
-        console.log("FormData result before sending:", data);
 
+        // Add current username for identification
+        data.current_username = localStorage.getItem("loggedInUsername");
+
+        // console.log("FormData result before sending:", data);
 
         try {
             const res = await fetch("/update-profile", {
@@ -123,7 +142,11 @@ function config_buttons(email) {
 
             const result = await res.json();
             if (res.ok) {
-                // alert("Profile updated successfully.");
+                // If username was changed, update localStorage too!
+                if (data.username && data.username !== data.current_username) {
+                    localStorage.setItem("loggedInUsername", data.username);
+                }
+
                 location.reload();
             } else {
                 alert(result.detail || "Update failed.");
@@ -147,7 +170,7 @@ function config_buttons(email) {
 function logout() {
     document.getElementById('logout-link').addEventListener('click', (e) => {
         e.preventDefault();
-        localStorage.removeItem("loggedInEmail");
+        localStorage.removeItem("loggedInUsername");
         window.location.href = "/";
     });
 }

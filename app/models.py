@@ -1,20 +1,18 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Literal
 from datetime import date, datetime
 
 
 class User(BaseModel):
-    username: Optional[str] = None
+    username: str
     password: str
     email: EmailStr
     is_premium: bool = False
     name: Optional[str] = None
-    # lastname: Optional[str] = None
     birthdate: Optional[date] = None
     gender: Optional[str] = None
     country: Optional[str] = None
     # credit_card: Optional[str] = None
-    profile_image: Optional[str] = None
 
 
 class Song(BaseModel):
@@ -43,14 +41,14 @@ class Favorite(BaseModel):
 
 
 class Playlist(BaseModel):
-    user_id: str  # Link to user
+    user_email: str
     name: str
-    items: List[Union[str, dict]] = []  # Song/Podcast IDs
+    description: Optional[str] = None
+    type: Literal["song", "podcast"] = "song"
+    items: List[Union[str, dict]] = []
 
 
 class SearchEntry(BaseModel):
     user_id: str
     query: str
     timestamp: datetime
-
-

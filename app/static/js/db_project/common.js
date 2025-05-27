@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const isLoggedIn = localStorage.getItem("loggedInEmail");
+  const isLoggedIn = localStorage.getItem("loggedInUsername");
 
   const loggedInSection = document.querySelector(".ms_top_btn.logged-in");
   const loggedOutSection = document.querySelector(".ms_top_btn.logged-out");
@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutLink = document.getElementById("logout-link");
   if (logoutLink) {
     logoutLink.addEventListener("click", () => {
-      localStorage.removeItem("loggedInEmail");
+      // localStorage.removeItem("loggedInEmail");
+      localStorage.removeItem("loggedInUsername");
       location.reload();
     });
   }

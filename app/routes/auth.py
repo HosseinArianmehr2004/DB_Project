@@ -1,15 +1,26 @@
 from fastapi import APIRouter, HTTPException
 import database, models, schemas
 
+
 router = APIRouter()
+
+
+@router.get("/get_username")
+async def get_username(email: str):
+    user = await database.db.users.find_one({"email": email})
+    if not user or "username" not in user:
+        raise HTTPException(status_code=404, detail="Username not found.")
+    return {"username": user["username"]}
 
 
 @router.post("/register")
 async def register_user(user: models.User):
     # Check if username or email already exists
-    existing_user = await database.db.users.find_one({"$or": [{"email": user.email}]})
+    existing_user = await database.db.users.find_one(
+        {"$or": [{"email": user.email}, {"username": user.username}]}
+    )
     if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists.")
+        raise HTTPException(status_code=400, detail="Username or email already exists.")
 
     # Insert user into the database
     result = await database.db.users.insert_one(user.dict())
