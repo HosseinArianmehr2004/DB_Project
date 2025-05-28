@@ -1,8 +1,12 @@
-from fastapi import APIRouter, HTTPException
-import database, models, schemas
+from fastapi import APIRouter, HTTPException, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+import schemas, models, security, database
 
 
 router = APIRouter()
+
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("/get_username")
@@ -22,20 +26,44 @@ async def register_user(user: models.User):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already exists.")
 
-    # Insert user into the database
-    result = await database.db.users.insert_one(user.dict())
+    # Generate salt and hash password
+    salt = security.generate_salt()
+    hashed_password = security.hash_password(user.password, salt)
+
+    # Prepare user data with hashed password
+    user_data = user.dict()
+    user_data["password"] = f"{salt}${hashed_password}"
+
+    # Insert into the database
+    result = await database.db.users.insert_one(user_data)
     return {"message": "User registered successfully", "id": str(result.inserted_id)}
 
 
 @router.post("/login")
-async def login_user(credentials: schemas.LoginRequest):
+@limiter.limit("3/minute")  # 3 sequential wrong password per minute
+# async def login_user(credentials: schemas.LoginRequest):
+async def login_user(request: Request, credentials: schemas.LoginRequest):
+    auth_error = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid username or password",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    # 1. Find user by email
     user = await database.db.users.find_one({"email": credentials.email})
     if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise auth_error
 
-    # Replace with your password check logic
-    if user["password"] != credentials.password:
-        raise HTTPException(status_code=400, detail="Incorrect password")
+    # 2. Extract salt and stored hash
+    try:
+        salt, stored_hash = user["password"].split("$")
+    except ValueError:
+        raise auth_error  # corrupted or invalid password format
 
-    # Optionally generate JWT and return
+    # 3. Hash the input password with the extracted salt
+    input_hashed_password = security.hash_password(credentials.password, salt)
+    if input_hashed_password != stored_hash:
+        raise auth_error
+
+    # 4. (Optional) Generate JWT token and return it
     return {"message": "Login successful"}
