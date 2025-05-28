@@ -36,35 +36,44 @@ document.addEventListener("DOMContentLoaded", () => {
     closeModal.addEventListener("click", closeModalFunc);
     cancelBtn.addEventListener("click", closeModalFunc);
 
-    // Create playlist card HTML element
     function createPlaylistCard(pl) {
         const col = document.createElement("div");
-        col.className = "col-lg-2 col-md-6 playlist-card";
+        col.className = "col-lg-2 col-md-6";
 
         col.innerHTML = `
-            <div class="ms_rcnt_box marger_bottom25">
-                <div class="ms_rcnt_box_img">
-                    <img 
-                        src="/static/images/playlists/${pl.username + "_" + pl.name}.jpg"
-                        alt="${pl.name}" class="img-fluid"
-                        onerror="this.onerror=null; this.src='/static/images/playlists/playlist_default.jpg';" 
-                    />
-                    <div class="ms_main_overlay">
-                        <div class="ms_box_overlay"></div>
-                        <div class="ms_play_icon">
-                            <img src="/static/images/svg/play.svg" alt="Play Icon" />
+            <a href="/playlist?name=${encodeURIComponent(pl.name)}&user=${encodeURIComponent(pl.username)}" class="playlist-link">
+                <div class="ms_rcnt_box marger_bottom25">
+                    <div class="ms_rcnt_box_img">
+                        <img 
+                            src="/static/images/playlists/${pl.username + "_" + pl.name}.jpg"
+                            alt="${pl.name}" class="img-fluid"
+                            onerror="this.onerror=null; this.src='/static/images/playlists/playlist_default.jpg';" 
+                        />
+                        <div class="ms_main_overlay">
+                            <div class="ms_box_overlay"></div>
+                            <div class="ms_play_icon">
+                                <img src="/static/images/svg/play.svg" alt="Play Icon" />
+                            </div>
                         </div>
                     </div>
+                    <div class="ms_rcnt_box_text">
+                        <h3>${pl.name}</h3>
+                        <p>${pl.items?.length || 0} Items</p>
+                    </div>
                 </div>
-                <div class="ms_rcnt_box_text">
-                    <h3><a href="#">${pl.name}</a></h3>
-                    <p>${pl.items?.length || 0} ${pl.type}s</p>
-                </div>
-            </div>
+            </a>
         `;
+
+        // Attach click listener to store playlist info
+        const link = col.querySelector("a.playlist-link");
+        link.addEventListener("click", () => {
+            localStorage.setItem("selectedPlaylistName", pl.name);
+            localStorage.setItem("selectedPlaylistUser", pl.username);
+        });
 
         return col;
     }
+
 
     // Load playlists from server and render them
     async function loadPlaylists() {
@@ -105,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const name = document.getElementById("playlistName").value.trim();
         const description = document.getElementById("playlistDescription").value.trim();
-        const type = document.querySelector("input[name='type']:checked")?.value;
+        // const type = document.querySelector("input[name='type']:checked")?.value;
         const imageInput = document.getElementById("playlistImage");
         const imageFile = imageInput.files[0];
 
@@ -113,17 +122,17 @@ document.addEventListener("DOMContentLoaded", () => {
             showMessage("Playlist name is required.");
             return;
         }
-        if (!type) {
-            showMessage("Playlist type must be selected.");
-            return;
-        }
+        // if (!type) {
+        //     showMessage("Playlist type must be selected.");
+        //     return;
+        // }
 
         // Prepare form data
         const formData = new FormData();
         formData.append("username", username);
         formData.append("name", name);
         formData.append("description", description);
-        formData.append("type", type);
+        // formData.append("type", type);
         formData.append("items", JSON.stringify([])); // empty list for new playlist
         if (imageFile) {
             formData.append("image", imageFile);
@@ -145,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     username,
                     name,
                     description,
-                    type,
+                    // type,
                     items: []
                 };
 

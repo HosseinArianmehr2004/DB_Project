@@ -31,7 +31,6 @@ async def create_playlist(
     username: str = Form(...),
     name: str = Form(...),
     description: str = Form(""),
-    type: str = Form(...),
     items: str = Form("[]"),
     image: UploadFile = File(None),
 ):
@@ -78,7 +77,6 @@ async def create_playlist(
         "username": username,
         "name": name,
         "description": description,
-        "type": type,
         "items": items_list,
     }
 

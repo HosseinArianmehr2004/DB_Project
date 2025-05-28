@@ -16,7 +16,6 @@ class User(BaseModel):
 
 
 class Song(BaseModel):
-    url: str
     title: str
     artist: str
     lyrics: Optional[str] = None
@@ -25,14 +24,13 @@ class Song(BaseModel):
     duration: float  # in seconds
 
 
-class Podcast(BaseModel):
-    url: str
-    title: str
-    host: str
-    description: Optional[str] = None
-    play_count: int = 0
-    genre: Optional[str] = None
-    duration: float
+# class Podcast(BaseModel):
+#     name: str
+#     host: str
+#     description: Optional[str] = None
+#     play_count: int = 0
+#     genre: Optional[str] = None
+#     duration: float
 
 
 class Favorite(BaseModel):
@@ -41,10 +39,10 @@ class Favorite(BaseModel):
 
 
 class Playlist(BaseModel):
-    user_email: str
+    username: str
     name: str
     description: Optional[str] = None
-    type: Literal["song", "podcast"] = "song"
+    # type: Literal["song", "podcast"] = "song"
     items: List[Union[str, dict]] = []
 
 
