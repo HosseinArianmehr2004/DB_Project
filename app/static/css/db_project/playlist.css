@@ -1,0 +1,347 @@
+/* Modal Styles */
+.asp-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.asp-modal-content {
+    background-color: #2d3748;
+    margin: 100px auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: asp-modalSlideIn 0.3s ease-out;
+}
+
+@keyframes asp-modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.asp-close {
+    color: #cbd5e0;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.asp-close:hover,
+.asp-close:focus {
+    color: #ffffff;
+}
+
+.asp-modal h2 {
+    margin-bottom: 25px;
+    color: #ffffff;
+    font-size: 24px;
+    text-align: center;
+}
+
+.asp-form-group {
+    margin-bottom: 20px;
+}
+
+.asp-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.asp-form-group input,
+.asp-form-group select,
+.asp-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #4a5568;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+    background-color: white;
+    color: black;
+}
+
+.asp-form-group input::placeholder,
+.asp-form-group textarea::placeholder {
+    color: #a0aec0;
+}
+
+.asp-form-group input:focus,
+.asp-form-group textarea:focus {
+    outline: none;
+    border-color: #1a365d;
+    box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.asp-form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.asp-modal-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: flex-end;
+}
+
+.asp-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.asp-btn-primary {
+    background-color: #1a365d;
+    color: white;
+}
+
+.asp-btn-primary:hover {
+    background-color: #0f2940;
+    transform: translateY(-2px);
+}
+
+.asp-btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.asp-btn-secondary:hover {
+    background-color: #545b62;
+    transform: translateY(-2px);
+}
+
+.asp-radio-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.asp-radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.asp-radio-item input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.asp-radio-item label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.asp-radio-item input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.asp-radio-item input[type="radio"]:checked {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+.asp-radio-item input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.asp-radio-item input[type="radio"]:hover {
+    border-color: #007bff;
+}
+
+.asp-form-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* Make lyrics and duration inputs span both columns */
+.asp-form-group[style*="grid-column: span 2"] {
+    grid-column: span 2;
+}
+
+.asp-modal-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.asp-span-2 {
+    grid-column: span 2;
+}
+
+.asp-modal-buttons.asp-buttons-space-between {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.asp-modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    /* optional spacing */
+}
+
+.message-box {
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-box.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.pl_album_list_wrapper {
+    width: 100%;
+    margin-top: 20px;
+    font-family: sans-serif;
+}
+
+.pl_album_list_header,
+.pl_album_list_row {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 12px 16px;
+    margin: 0;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f7f7f7;
+}
+
+.pl_album_list_row {
+    background-color: #fff;
+    transition: background 0.2s;
+}
+
+.pl_album_list_row:hover {
+    background-color: #f0f0f0;
+}
+
+.pl_album_list_header li,
+.pl_album_list_row li {
+    flex: 1;
+    padding: 5px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pl_album_list_header li:first-child,
+.pl_album_list_row li:first-child {
+    flex: 0.2;
+}
+
+.pl_text-center {
+    text-align: center;
+}
+
+.pl_icon {
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.pl_more_icon {
+    position: relative;
+}
+
+.pl_more_option {
+    display: none;
+    position: absolute;
+    top: 25px;
+    right: 0;
+    z-index: 100;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 6px 0;
+    min-width: 160px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pl_more_icon:hover .pl_more_option {
+    display: block;
+}
+
+.pl_more_option li {
+    padding: 8px 16px;
+}
+
+.pl_more_option li a {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.pl_more_option li a:hover {
+    background-color: #f5f5f5;
+}
+
+.pl_opt_icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
