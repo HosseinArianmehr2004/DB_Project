@@ -24,3 +24,8 @@ class FieldUpdate(BaseModel):
     email: str
     field: str
     value: str
+
+
+class FavoriteRequest(BaseModel):
+    username: str
+    title: str

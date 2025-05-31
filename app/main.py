@@ -17,6 +17,7 @@ from routes.auth import router as auth_router
 from routes.profile import router as profile_router
 from routes.add_playlist import router as add_playlist_router
 from routes.playlist import router as playlist_router
+from routes.favorite import router as favorite_router
 
 
 app = FastAPI()
@@ -69,3 +70,4 @@ app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(add_playlist_router)
 app.include_router(playlist_router)
+app.include_router(favorite_router)
