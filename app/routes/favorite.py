@@ -18,11 +18,16 @@ async def show_playlist_page(request: Request):
 @router.post("/api/favorite")
 async def add_to_favorite(data: schemas.FavoriteRequest):
     STATIC_MUSIC_PATH = "static/musics"
-    user_dir = os.path.join(STATIC_MUSIC_PATH, data.username)
-    source_song_path = os.path.join(user_dir, f"{data.title}.mp3")
 
-    favorite_folder = os.path.join(user_dir, "favorite")
-    os.makedirs(favorite_folder, exist_ok=True)  # create if not exist
+    # source: where the song is located (original owner's folder)
+    source_user_dir = os.path.join(STATIC_MUSIC_PATH, data.song_owner)
+    source_song_path = os.path.join(source_user_dir, f"{data.title}.mp3")
+
+    # destination: logged-in user's favorite folder
+    dest_user_dir = os.path.join(STATIC_MUSIC_PATH, data.username)
+    # favorite_folder = os.path.join(dest_user_dir, "favorite")
+    favorite_folder = dest_user_dir
+    os.makedirs(favorite_folder, exist_ok=True)
 
     destination_song_path = os.path.join(favorite_folder, f"{data.title}.mp3")
 
@@ -32,14 +37,14 @@ async def add_to_favorite(data: schemas.FavoriteRequest):
     if not os.path.exists(destination_song_path):
         shutil.copy2(source_song_path, destination_song_path)
 
-    # ✅ Update the user's favorite_items list in MongoDB
+    # ✅ Update MongoDB
     user = await database.db.users.find_one({"username": data.username})
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
 
     await database.db.users.update_one(
         {"username": data.username},
-        {"$addToSet": {"favorite_items": f"{data.title}"}},  # prevents duplicates
+        {"$addToSet": {"favorite_items": data.title}},  # avoids duplicates
     )
 
     return {"message": "Song added to favorites."}
@@ -79,7 +84,7 @@ async def remove_favorite(username: str, title: str):
     )
 
     # Remove song file from favorite folder
-    fav_path = f"./static/musics/{username}/favorite/{title}.mp3"
+    fav_path = f"./static/musics/{username}/{title}.mp3"
     if os.path.exists(fav_path):
         os.remove(fav_path)
 

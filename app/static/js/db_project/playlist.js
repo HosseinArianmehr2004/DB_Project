@@ -1,15 +1,61 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const genre = localStorage.getItem("selectedGenre");
     const playlist_name = localStorage.getItem("selectedPlaylistName");
     const username = localStorage.getItem("selectedPlaylistUser");
 
-    if (!playlist_name || !username) {
-        alert("Missing playlist playlist_name or username in localStorage");
-        return;
+    if (genre) {
+        fetch_songs_by_genre(genre);
+        localStorage.removeItem("selectedGenre");
+    } else if (playlist_name && username) {
+        fetch_playlist_info(playlist_name, username);
+        add_song();
+    } else {
+        alert("Missing playlist or genre in localStorage");
     }
-
-    fetch_playlist_info(playlist_name, username);
-    add_song();
 });
+
+// Fetch songs by genre from your backend
+function fetch_songs_by_genre(genre) {
+    fetch(`/api/genre-songs?genre=${encodeURIComponent(genre)}`)
+        .then(res => res.json())
+        .then(data => {
+            const items = data.songs || [];
+
+            // Prepare playlist-like structure
+            const playlistData = {
+                name: genre,
+                username: "Genre", // just a label
+                description: `Songs tagged with '${genre}'`,
+                items: items.map(song => ({
+                    ...song,
+                    file_url: `/static/musics/${song.username}/${encodeURIComponent(song.title)}.mp3`
+                })),
+                release: "N/A",
+                image_url: "/static/images/playlists/playlist_default.jpg"
+            };
+
+            // Update playlist UI
+            const playlist_img = document.getElementById("playlist_img");
+            const playlist_name = document.getElementById("playlist_name");
+            const playlist_owner = document.getElementById("playlist_owner");
+            const playlist_description = document.getElementById("playlist_description");
+            const playlist_summary = document.getElementById("playlist_summary");
+            const playlist_release = document.getElementById("playlist_release");
+
+            playlist_img.src = playlistData.image_url;
+            playlist_name.innerText = playlistData.name;
+            playlist_owner.innerText = "Genre";
+            playlist_description.innerText = playlistData.description;
+
+            const duration = fetch_playlist_songs(genre, "Genre", playlistData);
+            playlist_summary.innerText = `${items.length} songs | ${duration}`;
+            playlist_release.innerText = playlistData.release;
+        })
+        .catch(error => {
+            console.error("Error fetching genre songs:", error);
+            alert("Failed to load songs for this genre.");
+        });
+}
 
 function parseDuration(str) {
     try {
@@ -121,9 +167,9 @@ function fetch_playlist_songs(playlistName, username, data) {
         const duration = parseDuration(song.duration || "0:00");
         totalSeconds += duration;
 
-        const songFilePath = `/static/musics/${username}/${encodeURIComponent(song.title)}.mp3`;
+        const songFilePath = song.file_url || `/static/musics/${username}/${encodeURIComponent(song.title)}.mp3`;
         const songHTML = `
-            <ul class="playlist-song" data-title="${song.title}" data-artist="${song.artist}" data-file="${songFilePath}">
+            <ul class="playlist-song" data-title="${song.title}" data-artist="${song.artist}" data-file="${songFilePath}" data-owner-username="${song.username}">
                 <li><a href="#"><span class="play_no">${String(index + 1).padStart(2, "0")}</span><span class="play_hover"></span></a></li>
                 <li><a href="#">${song.title || "Unknown Title"}</a></li>
                 <li><a href="#">${song.genre || "Unknown Genre"}</a></li>
@@ -185,9 +231,6 @@ function fetch_playlist_songs(playlistName, username, data) {
             const playing_track_name = document.getElementById("playing_track_name");
             const playing_track_artist = document.getElementById("playing_track_artist");
 
-            console.log(`playing_track_name.innerText: ${playing_track_name.innerText}`);
-            console.log(`playing_track_artist.innerText: ${playing_track_artist.innerText}`);
-
             if (playing_track_name && playing_track_artist) {
                 playing_track_name.innerText = title;
                 playing_track_artist.innerText = artist;
@@ -201,7 +244,8 @@ function fetch_playlist_songs(playlistName, username, data) {
             event.stopPropagation();
 
             const songElement = icon.closest(".playlist-song");
-            const username = localStorage.getItem("selectedPlaylistUser");
+            const username = localStorage.getItem("loggedInUsername"); // <- logged-in user
+            const song_owner = songElement.dataset.ownerUsername; // <- owner of the song
             const title = songElement.dataset.title;
 
             const response = await fetch(`/api/favorite`, {
@@ -209,7 +253,7 @@ function fetch_playlist_songs(playlistName, username, data) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, title }),
+                body: JSON.stringify({ username, song_owner, title }),
             });
 
             if (response.ok) {

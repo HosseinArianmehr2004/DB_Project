@@ -17,6 +17,7 @@ class User(BaseModel):
 
 
 class Song(BaseModel):
+    username: str
     title: str
     artist: str
     lyrics: Optional[str] = None

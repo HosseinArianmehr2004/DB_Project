@@ -18,6 +18,8 @@ from routes.profile import router as profile_router
 from routes.add_playlist import router as add_playlist_router
 from routes.playlist import router as playlist_router
 from routes.favorite import router as favorite_router
+from routes.search import router as search_router
+from routes.genres import router as genres_router
 
 
 app = FastAPI()
@@ -31,6 +33,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request, exc):
@@ -71,3 +74,5 @@ app.include_router(profile_router)
 app.include_router(add_playlist_router)
 app.include_router(playlist_router)
 app.include_router(favorite_router)
+app.include_router(search_router)
+app.include_router(genres_router)

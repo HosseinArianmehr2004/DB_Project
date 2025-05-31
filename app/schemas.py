@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Union, Literal
+from typing import Optional
 from datetime import date
 
 
@@ -27,5 +27,10 @@ class FieldUpdate(BaseModel):
 
 
 class FavoriteRequest(BaseModel):
-    username: str
-    title: str
+    username: str  # logged-in user
+    song_owner: str  # owner of the song
+    title: str  # song title (without .mp3)
+
+
+class PlayCountUpdateRequest(BaseModel):
+    file_url: str

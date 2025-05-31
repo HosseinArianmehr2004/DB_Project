@@ -6,8 +6,6 @@ import database
 from typing import Dict, Any, Optional
 from bson import ObjectId
 from mutagen import File as MutagenFile
-from pathlib import Path
-import shutil
 import os
 
 
@@ -120,6 +118,7 @@ async def add_song_to_playlist(
         duration = round(audio.info.length, 2)
 
     new_song = {
+        "username": username,
         "title": name,
         "artist": artist,
         "lyrics": lyrics,
