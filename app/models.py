@@ -13,6 +13,7 @@ class User(BaseModel):
     gender: Optional[str] = None
     country: Optional[str] = None
     # credit_card: Optional[str] = None
+    favorite_items: List[str] = [] # sontain Songs
 
 
 class Song(BaseModel):
@@ -33,9 +34,14 @@ class Song(BaseModel):
 #     duration: float
 
 
-class Favorite(BaseModel):
-    user_id: str  # Foreign key (username or MongoDB _id)
-    items: List[Union[str, dict]] = []  # List of song or podcast IDs
+# class Favorite(BaseModel):
+#     user_id: str  # Foreign key (username or MongoDB _id)
+#     items: List[Union[str, dict]] = []  # List of song or podcast IDs
+
+
+# class Favorite(BaseModel):
+#     user_id: str  # Foreign key (username or MongoDB _id)
+#     items: List[str] = [] # sontain Songs
 
 
 class Playlist(BaseModel):

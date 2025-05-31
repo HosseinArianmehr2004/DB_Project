@@ -345,3 +345,27 @@
     margin-right: 8px;
     font-size: 16px;
 }
+
+.pl_message_box {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    background: #4caf50;
+    color: white;
+    border-radius: 5px;
+    z-index: 1000;
+
+    /* Start hidden and shifted right */
+    transform: translateX(120%);
+    opacity: 0;
+
+    /* Smooth transition for transform and opacity */
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* When visible, slide to position */
+.pl_message_box.show {
+    transform: translateX(0);
+    opacity: 1;
+}

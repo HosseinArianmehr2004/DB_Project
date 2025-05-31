@@ -119,9 +119,7 @@ function fetch_playlist_songs(playlistName, username, data) {
     songItems.forEach((song, index) => {
         // Parse duration and handle various formats
         const duration = parseDuration(song.duration || "0:00");
-
         totalSeconds += duration;
-
 
         const songFilePath = `/static/musics/${username}/${encodeURIComponent(song.title)}.mp3`;
         const songHTML = `
@@ -143,7 +141,6 @@ function fetch_playlist_songs(playlistName, username, data) {
                 </li>
             </ul>
         `;
-
 
         songsContainer.insertAdjacentHTML("beforeend", songHTML);
     });
@@ -198,6 +195,30 @@ function fetch_playlist_songs(playlistName, username, data) {
         });
     });
 
+    document.querySelectorAll(".ms_fav_icon").forEach((icon) => {
+        icon.addEventListener("click", async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const songElement = icon.closest(".playlist-song");
+            const username = localStorage.getItem("selectedPlaylistUser");
+            const title = songElement.dataset.title;
+
+            const response = await fetch(`/api/favorite`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, title }),
+            });
+
+            if (response.ok) {
+                add_to_favorite_message(`${title} added to favorites!`);
+            } else {
+                add_to_favorite_message("Failed to add to favorites.", true);
+            }
+        });
+    });
 
     return formatDuration(totalSeconds);
 }
@@ -291,5 +312,15 @@ function showMessage(type, text) {
     }, 4000); // Hide after 4 seconds
 }
 
+function add_to_favorite_message(message, isError = false) {
+    const box = document.getElementById("message-box");
+    box.textContent = message;
+    box.style.backgroundColor = isError ? "#f44336" : "#4caf50";
 
+    box.classList.add("show");
 
+    // Hide after 3 seconds with slide out
+    setTimeout(() => {
+        box.classList.remove("show");
+    }, 3000);
+}
