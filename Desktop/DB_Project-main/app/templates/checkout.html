@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade to Premium - Checkout</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="padder_top80" style="background-color: #14182a;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-8"> 
+                <div class="ms_free_download ms_purchase_wrapper padder_top30 padder_bottom30" 
+                     style="background: linear-gradient(90deg, #14182a, #1b2039); border-radius: 15px; box-shadow: 0 0 20px rgba(59, 200, 231, 0.3); padding: 0 40px;">
+                    <h2 class="ms_color text-center marger_bottom25">💳 Upgrade to Premium</h2>
+                    <form id="purchaseForm" class="padder_top20">
+                        <div class="form-group position-relative marger_bottom20">
+                            <label for="cardNumber" class="ms_color">Card Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" style="background: transparent; border: none; color: #3bc8e7;"><i class="fa fa-credit-card"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group position-relative marger_bottom20">
+                            <label for="expiry" class="ms_color">Expiry Date</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="expiry" placeholder="MM/YY" maxlength="5" inputmode="numeric">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" style="background: transparent; border: none; color: #3bc8e7;"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group position-relative marger_bottom20">
+                            <label for="cvv" class="ms_color">CVV</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cvv" placeholder="1234" maxlength="4" inputmode="numeric">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" style="background: transparent; border: none; color: #3bc8e7;"><i class="fa fa-lock"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="ms_btn" style="height: 45px; line-height: 45px; width: 200px; display: block; margin: 0 auto;">Upgrade Now</button>
+                    </form>
+                    <div id="message" class="text-center marger_top20 ms_color"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/db_project/purchase.js"></script>
+</body>
+</html>
